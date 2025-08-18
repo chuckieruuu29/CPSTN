@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { productsAPI, ordersAPI, authAPI } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function CustomerPortal() {
 	const navigate = useNavigate();
@@ -37,20 +37,32 @@ export default function CustomerPortal() {
 	};
 
 	return (
-		<div style={{ padding: 20 }}>
-			<h2>Customer Portal</h2>
-			{message && <p>{message}</p>}
-			<h3>Products</h3>
-			<ul>
-				{products.map((p) => (
-					<li key={p.id}>
-						{p.name} - {p.price}
-						<button onClick={() => addToCart(p.id)} style={{ marginLeft: 8 }}>Add</button>
-						{cart[p.id] && <button onClick={() => removeFromCart(p.id)} style={{ marginLeft: 8 }}>Remove</button>}
-					</li>
-				))}
-			</ul>
-			<button onClick={placeOrder} disabled={!Object.keys(cart).length}>Place Order</button>
+		<div>
+			<header style={{
+				display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 16,
+				background: '#fff', borderBottom: '1px solid var(--border-color)'
+			}}>
+				<div style={{ fontWeight: 700 }}>Customer Portal</div>
+				<Link to="/admin/dashboard" className="btn btn-secondary">Admin</Link>
+			</header>
+			<div style={{ padding: 16 }}>
+				{message && <div className="alert alert-success">{message}</div>}
+				<div className="grid grid-cols-3" style={{ gap: 12 }}>
+					{products.map((p) => (
+						<div className="card" key={p.id}>
+							<div style={{ fontWeight: 600 }}>{p.name}</div>
+							<div style={{ color: 'var(--text-muted)' }}>₱ {Number(p.price).toFixed(2)}</div>
+							<div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+								<button className="btn btn-primary" onClick={() => addToCart(p.id)}>Add</button>
+								{cart[p.id] && <button className="btn btn-secondary" onClick={() => removeFromCart(p.id)}>Remove</button>}
+							</div>
+						</div>
+					))}
+				</div>
+				<div style={{ marginTop: 16 }}>
+					<button className="btn btn-success" onClick={placeOrder} disabled={!Object.keys(cart).length}>Place Order</button>
+				</div>
+			</div>
 		</div>
 	);
 }

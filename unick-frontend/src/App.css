@@ -200,6 +200,19 @@ label {
   box-shadow: var(--shadow-md);
 }
 
+/* Table */
+.table table {
+  border-collapse: collapse;
+}
+.table th, .table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+.table thead th {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .card-header {
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);

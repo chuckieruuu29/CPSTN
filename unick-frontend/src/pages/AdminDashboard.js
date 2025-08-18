@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { inventoryAPI, ordersAPI, authAPI } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route, Navigate, Link } from 'react-router-dom';
+import Sidebar from '../components/common/Sidebar';
+import Footer from '../components/common/Footer';
+import Dashboard from '../components/admin/Dashboard';
+import Inventory from '../components/admin/Inventory';
+import Production from '../components/admin/Production';
+import Reports from '../components/admin/Reports';
+import Forecasting from '../components/admin/Forecasting';
+import Customers from '../components/admin/Customers';
+import Products from '../components/admin/Products';
+import Orders from '../components/admin/Orders';
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
@@ -31,35 +41,38 @@ export default function AdminDashboard() {
 	};
 
 	return (
-		<div style={{ padding: 20 }}>
-			<h2>Admin Dashboard</h2>
-			<button onClick={logout} style={{ float: 'right' }}>Logout</button>
-			<h3>Low Stock</h3>
-			<div style={{ display: 'flex', gap: 20 }}>
-				<div>
-					<h4>Raw Materials</h4>
-					<ul>
-						{(lowStock.raw_materials || []).map((m) => (
-							<li key={`rm-${m.id}`}>{m.name} (Stock: {m.current_stock}, Min: {m.minimum_stock})</li>
-						))}
-					</ul>
-				</div>
-				<div>
-					<h4>Products</h4>
-					<ul>
-						{(lowStock.products || []).map((p) => (
-							<li key={`p-${p.id}`}>{p.name} (Stock: {p.current_stock}, Min: {p.minimum_stock})</li>
-						))}
-					</ul>
-				</div>
+		<div style={{ display: 'flex' }}>
+			<Sidebar />
+			<div style={{ flex: 1, minHeight: '100vh', background: 'var(--background-color)' }}>
+				<header style={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					padding: 16,
+					background: '#fff',
+					borderBottom: '1px solid var(--border-color)'
+				}}>
+					<div style={{ fontWeight: 700 }}>Admin</div>
+					<div style={{ display: 'flex', gap: 10 }}>
+						<Link to="/portal" className="btn btn-secondary">Customer Portal</Link>
+						<button className="btn btn-primary" onClick={logout}>Logout</button>
+					</div>
+				</header>
+				<main style={{ padding: 16 }}>
+					<Routes>
+						<Route path="/admin/dashboard" element={<Dashboard lowStock={lowStock} orders={orders} />} />
+						<Route path="/admin/inventory" element={<Inventory />} />
+						<Route path="/admin/production" element={<Production />} />
+						<Route path="/admin/orders" element={<Orders />} />
+						<Route path="/admin/reports" element={<Reports />} />
+						<Route path="/admin/forecasting" element={<Forecasting />} />
+						<Route path="/admin/customers" element={<Customers />} />
+						<Route path="/admin/products" element={<Products />} />
+						<Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+					</Routes>
+				</main>
+				<Footer />
 			</div>
-
-			<h3 style={{ marginTop: 24 }}>Recent Orders</h3>
-			<ul>
-				{orders.map((o) => (
-					<li key={o.id}>#{o.order_number} - {o.status} - {o.total_amount}</li>
-				))}
-			</ul>
 		</div>
 	);
 }

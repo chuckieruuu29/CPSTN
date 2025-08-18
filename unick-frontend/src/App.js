@@ -15,7 +15,7 @@ function App() {
 			<Routes>
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
-				<Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+				<Route path="/admin/*" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
 				<Route path="/portal" element={<PrivateRoute><CustomerPortal /></PrivateRoute>} />
 				<Route path="*" element={<Navigate to="/login" replace />} />
 			</Routes>
