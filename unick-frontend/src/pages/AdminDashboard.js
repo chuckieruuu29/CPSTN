@@ -1,27 +1,48 @@
-import { useEffect, useState } from 'react';
-import { inventoryAPI, ordersAPI, authAPI } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { inventoryAPI, ordersAPI, authAPI, reportsAPI } from '../services/api';
+import { useNavigate, Routes, Route, Link, Navigate } from 'react-router-dom';
+import Sidebar from '../components/common/Sidebar';
+import Footer from '../components/common/Footer';
+import Loading from '../components/common/Loading';
+import Dashboard from '../components/admin/Dashboard';
+import Inventory from '../components/admin/Inventory';
+import Production from '../components/admin/Production';
+import Reports from '../components/admin/Reports';
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
-	const [lowStock, setLowStock] = useState({ raw_materials: [], products: [] });
-	const [orders, setOrders] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [overview, setOverview] = useState({
+		lowStock: { raw_materials: [], products: [] },
+		orders: [],
+		salesSummary: null
+	});
 
 	useEffect(() => {
 		(async () => {
 			try {
 				await authAPI.profile();
-				const [ls, os] = await Promise.all([
+				const [ls, os, ss] = await Promise.all([
 					inventoryAPI.getLowStock(),
-					ordersAPI.getAll({ per_page: 10 })
+					ordersAPI.getAll({ per_page: 8 }),
+					reportsAPI.getSales({ range: 'last_30_days' })
 				]);
-				setLowStock(ls.data);
-				setOrders(os.data.data || []);
+				setOverview({
+					lowStock: ls.data,
+					orders: os.data.data || [],
+					salesSummary: ss.data || null
+				});
 			} catch (e) {
 				navigate('/login', { replace: true });
+			} finally {
+				setLoading(false);
 			}
 		})();
 	}, [navigate]);
+
+	const user = useMemo(() => {
+		try { return JSON.parse(localStorage.getItem('user_data') || '{}'); } catch { return {}; }
+	}, []);
 
 	const logout = async () => {
 		try { await authAPI.logout(); } catch {}
@@ -31,35 +52,37 @@ export default function AdminDashboard() {
 	};
 
 	return (
-		<div style={{ padding: 20 }}>
-			<h2>Admin Dashboard</h2>
-			<button onClick={logout} style={{ float: 'right' }}>Logout</button>
-			<h3>Low Stock</h3>
-			<div style={{ display: 'flex', gap: 20 }}>
-				<div>
-					<h4>Raw Materials</h4>
-					<ul>
-						{(lowStock.raw_materials || []).map((m) => (
-							<li key={`rm-${m.id}`}>{m.name} (Stock: {m.current_stock}, Min: {m.minimum_stock})</li>
-						))}
-					</ul>
-				</div>
-				<div>
-					<h4>Products</h4>
-					<ul>
-						{(lowStock.products || []).map((p) => (
-							<li key={`p-${p.id}`}>{p.name} (Stock: {p.current_stock}, Min: {p.minimum_stock})</li>
-						))}
-					</ul>
-				</div>
-			</div>
+		<div style={{ display: 'flex', minHeight: '100vh' }}>
+			<Sidebar />
 
-			<h3 style={{ marginTop: 24 }}>Recent Orders</h3>
-			<ul>
-				{orders.map((o) => (
-					<li key={o.id}>#{o.order_number} - {o.status} - {o.total_amount}</li>
-				))}
-			</ul>
+			<main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+				<header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: '#fff', borderBottom: '1px solid #e2e8f0' }}>
+					<div>
+						<h3 style={{ margin: 0 }}>Welcome, {user?.name || 'Admin'}</h3>
+						<div style={{ color: '#64748b', fontSize: 14 }}>Have a productive day</div>
+					</div>
+					<div style={{ display: 'flex', gap: 8 }}>
+						<Link to="/portal" className="btn btn-secondary">Customer Portal</Link>
+						<button onClick={logout} className="btn btn-primary">Logout</button>
+					</div>
+				</header>
+
+				<div style={{ padding: 16 }}>
+					{loading ? (
+						<Loading />
+					) : (
+						<Routes>
+							<Route path="/" element={<Dashboard overview={overview} />} />
+							<Route path="inventory" element={<Inventory />} />
+							<Route path="production" element={<Production />} />
+							<Route path="reports" element={<Reports />} />
+							<Route path="*" element={<Navigate to="/admin" replace />} />
+						</Routes>
+					)}
+				</div>
+
+				<Footer />
+			</main>
 		</div>
 	);
 }
