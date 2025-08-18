@@ -8,6 +8,10 @@ import Dashboard from '../components/admin/Dashboard';
 import Inventory from '../components/admin/Inventory';
 import Production from '../components/admin/Production';
 import Reports from '../components/admin/Reports';
+import Orders from '../components/admin/Orders';
+import Forecasting from '../components/admin/Forecasting';
+import Customers from '../components/admin/Customers';
+import Settings from '../components/admin/Settings';
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
@@ -76,6 +80,10 @@ export default function AdminDashboard() {
 							<Route path="inventory" element={<Inventory />} />
 							<Route path="production" element={<Production />} />
 							<Route path="reports" element={<Reports />} />
+							<Route path="orders" element={<Orders />} />
+							<Route path="forecasting" element={<Forecasting />} />
+							<Route path="customers" element={<Customers />} />
+							<Route path="settings" element={<Settings />} />
 							<Route path="*" element={<Navigate to="/admin" replace />} />
 						</Routes>
 					)}
