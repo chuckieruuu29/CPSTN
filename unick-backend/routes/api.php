@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\ProductionController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\ForecastController;
 
 // Authentication
 Route::post('/login', [AuthController::class, 'login']);
@@ -44,6 +46,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('reports/inventory/download', [ReportController::class, 'generateInventoryPDF']);
     Route::get('reports/sales/download', [ReportController::class, 'generateSalesPDF']);
     Route::get('reports/production/download', [ReportController::class, 'generateProductionPDF']);
+
+    // Customers
+    Route::apiResource('customers', CustomerController::class);
+
+    // Forecasting
+    Route::get('forecast/demand', [ForecastController::class, 'demand']);
+    Route::post('forecast/generate', [ForecastController::class, 'generate']);
+    Route::get('forecast/reorder-recommendations', [ForecastController::class, 'reorderRecommendations']);
 
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index']);
