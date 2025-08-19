@@ -11,6 +11,7 @@ use App\Models\InventoryTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -146,5 +147,24 @@ class ReportController extends Controller
 		$pdf = Pdf::loadView('reports.production', compact('data'));
 		
 		return $pdf->download('production-report-' . now()->format('Y-m-d') . '.pdf');
+	}
+
+	// Excel exports
+	public function exportInventory()
+	{
+		$data = $this->inventory()->getData();
+		return Excel::download(new \App\Exports\GenericArrayExport($data), 'inventory-report-' . now()->format('Y-m-d') . '.xlsx');
+	}
+
+	public function exportSales(Request $request)
+	{
+		$data = $this->sales($request)->getData();
+		return Excel::download(new \App\Exports\GenericArrayExport($data), 'sales-report-' . now()->format('Y-m-d') . '.xlsx');
+	}
+
+	public function exportProduction(Request $request)
+	{
+		$data = $this->production($request)->getData();
+		return Excel::download(new \App\Exports\GenericArrayExport($data), 'production-report-' . now()->format('Y-m-d') . '.xlsx');
 	}
 }

@@ -7,6 +7,7 @@ use App\Models\RawMaterial;
 use App\Models\Product;
 use App\Models\InventoryTransaction;
 use Illuminate\Http\Request;
+use App\Events\LowStockAlert;
 
 class InventoryController extends Controller
 {
@@ -70,6 +71,7 @@ class InventoryController extends Controller
                 'reference' => $request->reference,
                 'user_id' => $request->user()->id
             ]);
+            if ($item->isLowStock()) { try { event(new LowStockAlert(['type' => 'raw_material', 'id' => $item->id, 'name' => $item->name, 'current_stock' => $item->current_stock, 'minimum_stock' => $item->minimum_stock])); } catch (\Throwable $e) {} }
         } else {
             $item = Product::findOrFail($request->item_id);
             $newStock = $this->calculateNewStock($item->current_stock, $request->adjustment_type, $request->quantity);
@@ -83,6 +85,7 @@ class InventoryController extends Controller
                 'reference' => $request->reference,
                 'user_id' => $request->user()->id
             ]);
+            if ($item->isLowStock()) { try { event(new LowStockAlert(['type' => 'product', 'id' => $item->id, 'name' => $item->name, 'current_stock' => $item->current_stock, 'minimum_stock' => $item->minimum_stock])); } catch (\Throwable $e) {} }
         }
 
         return response()->json([

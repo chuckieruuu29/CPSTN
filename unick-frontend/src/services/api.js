@@ -85,4 +85,11 @@ export const reportsAPI = {
   downloadInventory: () => api.get('/reports/inventory/download', { responseType: 'blob' }),
   downloadSales: (params) => api.get('/reports/sales/download', { params, responseType: 'blob' }),
   downloadProduction: (params) => api.get('/reports/production/download', { params, responseType: 'blob' }),
+  exportInventory: () => api.get('/reports/inventory/export', { responseType: 'blob' }),
+  exportSales: (params) => api.get('/reports/sales/export', { params, responseType: 'blob' }),
+  exportProduction: (params) => api.get('/reports/production/export', { params, responseType: 'blob' }),
+};
+
+export const dashboardAPI = {
+  overview: () => api.get('/dashboard/overview'),
 };

@@ -20,16 +20,17 @@ export default function Production() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="card">
-			<h3>Production Tracking</h3>
-			<table width="100%">
+		<div className="card p-3">
+			<h3 className="mb-3">Production Tracking</h3>
+			<table className="table">
 				<thead>
 					<tr>
-						<th align="left">Batch</th>
-						<th align="left">Order #</th>
-						<th align="left">Status</th>
-						<th align="left">Start</th>
-						<th align="left">End</th>
+						<th>Batch</th>
+						<th>Order #</th>
+						<th>Status</th>
+						<th>Progress</th>
+						<th>Start</th>
+						<th>End</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,7 +38,12 @@ export default function Production() {
 						<tr key={b.id}>
 							<td>{b.batch_number}</td>
 							<td>{b.order?.order_number}</td>
-							<td>{b.status}</td>
+							<td><span className="badge text-bg-secondary">{b.status}</span></td>
+							<td style={{ width: 200 }}>
+								<div className="progress" role="progressbar" aria-valuenow={b.progress || 0} aria-valuemin="0" aria-valuemax="100">
+									<div className="progress-bar" style={{ width: `${b.progress || 0}%`, backgroundColor: '#8a5b2a' }}></div>
+								</div>
+							</td>
 							<td>{b.start_date || '-'}</td>
 							<td>{b.end_date || '-'}</td>
 						</tr>
