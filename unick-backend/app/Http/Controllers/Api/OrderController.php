@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductionBatch;
 use Illuminate\Http\Request;
+use App\Events\NewOrderCreated;
 
 class OrderController extends Controller
 {
@@ -65,6 +66,9 @@ class OrderController extends Controller
         }
 
         $order->calculateTotals();
+
+        // Broadcast real-time new order event
+        try { event(new NewOrderCreated($order)); } catch (\Throwable $e) {}
 
         return response()->json($order->load(['items.product', 'customer.user']), 201);
     }

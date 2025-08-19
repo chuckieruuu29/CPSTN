@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ForecastController;
+use App\Http\Controllers\Api\DashboardController;
 
 // Authentication
 Route::post('/login', [AuthController::class, 'login']);
@@ -46,6 +47,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('reports/inventory/download', [ReportController::class, 'generateInventoryPDF']);
     Route::get('reports/sales/download', [ReportController::class, 'generateSalesPDF']);
     Route::get('reports/production/download', [ReportController::class, 'generateProductionPDF']);
+    // Excel exports
+    Route::get('reports/inventory/export', [ReportController::class, 'exportInventory']);
+    Route::get('reports/sales/export', [ReportController::class, 'exportSales']);
+    Route::get('reports/production/export', [ReportController::class, 'exportProduction']);
 
     // Customers
     Route::apiResource('customers', CustomerController::class);
@@ -60,4 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
+
+    // Dashboard
+    Route::get('dashboard/overview', [DashboardController::class, 'overview']);
 });
