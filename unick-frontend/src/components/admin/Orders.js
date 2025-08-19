@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Loading from '../common/Loading';
 import { ordersAPI } from '../../services/api';
 
@@ -7,7 +7,7 @@ export default function Orders() {
 	const [orders, setOrders] = useState([]);
 	const [status, setStatus] = useState('');
 
-	const load = async () => {
+	const load = useCallback(async () => {
 		setLoading(true);
 		try {
 			const params = { per_page: 20 };
@@ -17,9 +17,9 @@ export default function Orders() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [status]);
 
-	useEffect(() => { load(); }, []);
+	useEffect(() => { load(); }, [load]);
 
 	const approve = async (id) => {
 		await ordersAPI.approve(id);

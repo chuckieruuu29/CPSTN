@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: unick
+      MYSQL_USER: unick
+      MYSQL_PASSWORD: unick
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  echo:
+    image: node:18-alpine
+    working_dir: /app
+    command: sh -c "npx --yes laravel-echo-server@1.7.0 start -c /app/laravel-echo-server.json"
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./unick-backend:/app
+    depends_on:
+      - redis
+
+volumes:
+  db_data:
+
