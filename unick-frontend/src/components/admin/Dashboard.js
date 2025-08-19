@@ -3,7 +3,7 @@ import { inventoryAPI, ordersAPI } from '../../services/api';
 import Loading from '../common/Loading';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Tooltip, Legend } from 'chart.js';
-import { getSocket, listenNotifications } from '../../services/socket';
+import { listenNotifications } from '../../services/realtime';
 import { toast } from 'react-toastify';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Tooltip, Legend);
