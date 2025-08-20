@@ -8,7 +8,8 @@ export default function Sidebar() {
 		borderRadius: 8,
 		textDecoration: 'none',
 		color: isActive ? '#fff' : 'var(--text-primary)',
-		background: isActive ? 'linear-gradient(135deg,#8b5a2b,#a7743f)' : 'transparent'
+		background: isActive ? 'linear-gradient(135deg,#8b5a2b,#a7743f)' : 'transparent',
+		cursor: 'pointer' // Makes the link look clickable
 	});
 
 	return (
