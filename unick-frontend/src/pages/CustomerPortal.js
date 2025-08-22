@@ -1,68 +1,53 @@
-import { useEffect, useState } from 'react';
-import { productsAPI, ordersAPI, authAPI } from '../services/api';
-import { useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ProductCatalog from "../components/customer/ProductCatalog";
+import ProductDetail from "../components/customer/ProductDetails";
+import Cart from "../components/customer/Cart";
+import OrderTracking from "../components/customer/OrderTracking";
 
 export default function CustomerPortal() {
-	const navigate = useNavigate();
-	const [products, setProducts] = useState([]);
-	const [cart, setCart] = useState({});
-	const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
 
-	useEffect(() => {
-		(async () => {
-			try {
-				await authAPI.profile();
-				const res = await productsAPI.getAll({ per_page: 50 });
-				setProducts(res.data.data || []);
-			} catch (e) {
-				navigate('/login', { replace: true });
-			}
-		})();
-	}, [navigate]);
+  return (
+    <div style={{ minHeight: "100vh", background: "#fdf9f1" }}>
+      {/* Top Navbar */}
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 24px",
+          background: "#8a5b2a",
+          color: "#fff",
+        }}
+      >
+        <div style={{ fontWeight: "bold", fontSize: 20 }}>
+          Unick Enterprises
+        </div>
+        <nav style={{ display: "flex", gap: 24 }}>
+          <Link to="/portal/products" style={{ color: "#fff" }}>
+            Products
+          </Link>
+          <Link to="/portal/orders" style={{ color: "#fff" }}>
+            My Orders
+          </Link>
+          <Link to="/portal/cart" style={{ color: "#fff" }}>
+            🛒 Cart ({cartCount})
+          </Link>
+          <div style={{ cursor: "pointer" }}>👤 Customer ▾</div>
+        </nav>
+      </header>
 
-	const addToCart = (id) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
-	const removeFromCart = (id) => setCart((c) => { const n = { ...c }; delete n[id]; return n; });
-
-	const placeOrder = async () => {
-		setMessage('');
-		const items = Object.entries(cart).map(([product_id, quantity]) => ({ product_id, quantity }));
-		if (!items.length) return;
-		try {
-			const res = await ordersAPI.create({ items });
-			setCart({});
-			setMessage(`Order placed: #${res.data.order_number}`);
-		} catch {
-			setMessage('Failed to place order');
-		}
-	};
-
-	return (
-		<div>
-			<header style={{
-				display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 16,
-				background: '#fff', borderBottom: '1px solid var(--border-color)'
-			}}>
-				<div style={{ fontWeight: 700 }}>Customer Portal</div>
-				<Link to="/admin/dashboard" className="btn btn-secondary">Admin</Link>
-			</header>
-			<div style={{ padding: 16 }}>
-				{message && <div className="alert alert-success">{message}</div>}
-				<div className="grid grid-cols-3" style={{ gap: 12 }}>
-					{products.map((p) => (
-						<div className="card" key={p.id}>
-							<div style={{ fontWeight: 600 }}>{p.name}</div>
-							<div style={{ color: 'var(--text-muted)' }}>₱ {Number(p.price).toFixed(2)}</div>
-							<div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-								<button className="btn btn-primary" onClick={() => addToCart(p.id)}>Add</button>
-								{cart[p.id] && <button className="btn btn-secondary" onClick={() => removeFromCart(p.id)}>Remove</button>}
-							</div>
-						</div>
-					))}
-				</div>
-				<div style={{ marginTop: 16 }}>
-					<button className="btn btn-success" onClick={placeOrder} disabled={!Object.keys(cart).length}>Place Order</button>
-				</div>
-			</div>
-		</div>
-	);
+      {/* Page Content */}
+      <main style={{ padding: 24 }}>
+        <Routes>
+          <Route path="/products" element={<ProductCatalog setCartCount={setCartCount} />} />
+          <Route path="/products/:id" element={<ProductDetail setCartCount={setCartCount} />} />
+          <Route path="/cart" element={<Cart setCartCount={setCartCount} />} />
+          <Route path="/orders" element={<OrderTracking />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }

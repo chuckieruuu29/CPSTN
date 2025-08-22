@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
@@ -18,29 +18,46 @@ function PrivateRoute({ children }) {
 	return token ? children : <Navigate to="/login" replace />;
 }
 
+function Layout({ children }) {
+	const location = useLocation();
+
+	// ✅ Show Sidebar only on admin routes
+	const isAdminRoute = location.pathname.startsWith("/admin");
+
+	return (
+		<div style={{ display: 'flex' }}>
+			{isAdminRoute && <Sidebar />}
+			<div style={{ flex: 1, padding: isAdminRoute ? 24 : 0 }}>
+				{children}
+			</div>
+		</div>
+	);
+}
+
 function App() {
 	return (
 		<BrowserRouter>
-			<div style={{ display: 'flex' }}>
-				<Sidebar />
-				<div style={{ flex: 1, padding: 24 }}>
-					<Routes>
-						<Route path="/login" element={<Login />} />
-						<Route path="/register" element={<Register />} />
-						<Route path="/admin/*" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
-						<Route path="/portal" element={<PrivateRoute><CustomerPortal /></PrivateRoute>} />
-						<Route path="/admin/dashboard" element={<Dashboard />} />
-						<Route path="/admin/forecasting" element={<Forecasting />} />
-						<Route path="/admin/inventory" element={<Inventory />} />
-						<Route path="/admin/orders" element={<Orders />} />
-						<Route path="/admin/production" element={<Production />} />
-						<Route path="/admin/products" element={<Products />} />
-						<Route path="/admin/reports" element={<Reports />} />
-						<Route path="/admin/settings" element={<Settings />} />
-						<Route path="*" element={<Navigate to="/login" replace />} />
-					</Routes>
-				</div>
-			</div>
+			<Layout>
+				<Routes>
+					<Route path="/login" element={<Login />} />
+					<Route path="/register" element={<Register />} />
+					<Route path="/admin/*" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+					<Route path="/portal/*" element={<PrivateRoute><CustomerPortal /></PrivateRoute>} />
+					
+					{/* Admin subroutes */}
+					<Route path="/admin/dashboard" element={<Dashboard />} />
+					<Route path="/admin/forecasting" element={<Forecasting />} />
+					<Route path="/admin/inventory" element={<Inventory />} />
+					<Route path="/admin/orders" element={<Orders />} />
+					<Route path="/admin/production" element={<Production />} />
+					<Route path="/admin/products" element={<Products />} />
+					<Route path="/admin/reports" element={<Reports />} />
+					<Route path="/admin/settings" element={<Settings />} />
+
+					{/* Default redirect */}
+					<Route path="*" element={<Navigate to="/login" replace />} />
+				</Routes>
+			</Layout>
 		</BrowserRouter>
 	);
 }
