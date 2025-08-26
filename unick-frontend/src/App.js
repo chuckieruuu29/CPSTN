@@ -12,6 +12,7 @@ import Production from './components/admin/Production';
 import Products from './components/admin/Products';
 import Reports from './components/admin/Reports';
 import Settings from './components/admin/Settings';
+import Customers from './components/admin/Customers';
 
 function PrivateRoute({ children }) {
 	const token = localStorage.getItem('auth_token');
@@ -53,6 +54,7 @@ function App() {
 					<Route path="/admin/products" element={<Products />} />
 					<Route path="/admin/reports" element={<Reports />} />
 					<Route path="/admin/settings" element={<Settings />} />
+					<Route path="/admin/customers" element={<Customers />} />
 
 					{/* Default redirect */}
 					<Route path="*" element={<Navigate to="/login" replace />} />
